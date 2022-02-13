@@ -1,3 +1,6 @@
+# personal folders
+data/pancan_scaled_zeroone_rnaseq.tsv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
