@@ -2,6 +2,7 @@
 data/pancan_scaled_zeroone_rnaseq.tsv
 project_plan.pdf
 project_schedule.xlsx
+my_env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
