@@ -19,6 +19,7 @@ from sklearn.metrics import precision_score, f1_score, precision_score
 
 from imblearn.over_sampling import SVMSMOTE, ADASYN, SMOTE, KMeansSMOTE, BorderlineSMOTE, SVMSMOTE, RandomOverSampler, SMOTENC
 from imblearn.combine import SMOTETomek, SMOTEENN
+from imblearn.under_sampling import ClusterCentroids, CondensedNearestNeighbour, RandomUnderSampler, NeighbourhoodCleaningRule, EditedNearestNeighbours, AllKNN, RepeatedEditedNearestNeighbours, InstanceHardnessThreshold, NearMiss, OneSidedSelection, TomekLinks
 
 from imblearn.metrics import geometric_mean_score, sensitivity_score, specificity_score
 
@@ -46,11 +47,11 @@ def round_up(n, decimals=0):
 def import_data():
     print('Importing the data...')
     #importing the datasets
-    rnaData = pd.read_csv(pathlib.Path.cwd().joinpath('data/pancan_scaled_zeroone_rnaseq.tsv'), sep='\t')
+    rnaData = pd.read_csv(pathlib.Path.cwd().joinpath('data/encoded_rna_df_100.csv'))
     rnaData.rename(columns={"Unnamed: 0": "sample_id"}, inplace=True)
     clinicalData = pd.read_csv(pathlib.Path.cwd().joinpath('data/clinical_data.csv'))
-    rnaData_columns = rnaData.columns
-    clinicalData_columns = clinicalData.columns
+    #rnaData_columns = rnaData.columns
+    #clinicalData_columns = clinicalData.columns
     #merging clinical data and rnadata
     combined = pd.merge(rnaData, clinicalData, on="sample_id")
     #dropping the irrelevant columns
@@ -62,14 +63,16 @@ def import_data():
     combined.dropna(inplace=True)
 
 
+    
+
+    return combined
+
+def plot(combined):
+
     #plotting the class distribution
     class_dist=combined['acronym'].value_counts()
     classes = np.array(class_dist.index)
     class_count = np.array(class_dist.values)
-
-    return combined, classes, class_count
-
-def plot(classes, class_count):
 
     fig, ax = plt.subplots(figsize =(16, 9))
     ax.barh(classes, class_count)
@@ -106,31 +109,31 @@ def plot(classes, class_count):
 
 
 def encode_reduce(combined):
-    print('Encoding with PCA...')
+    print('Labelling encoding...')
     labelencoder = LabelEncoder()
     X=np.array(combined.iloc[:,1:-3])
     y=labelencoder.fit_transform(np.array(combined.iloc[:,-3]))
     y_stage = labelencoder.fit_transform(np.array(combined.iloc[:,-1]))
 
 
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-    pca = PCA()
-    pca.fit_transform(X)
-    total = sum(pca.explained_variance_)
-    k = 0
-    current_variance = 0
-    while current_variance/total < 0.90:
-        current_variance += pca.explained_variance_[k]
-        k = k + 1
+    # scaler = StandardScaler()
+    # X = scaler.fit_transform(X)
+    # pca = PCA()
+    # pca.fit_transform(X)
+    # total = sum(pca.explained_variance_)
+    # k = 0
+    # current_variance = 0
+    # while current_variance/total < 0.90:
+    #     current_variance += pca.explained_variance_[k]
+    #     k = k + 1
 
-    print(k, " features explain around 90% of the variance. From 7129 features to ", k, ", not too bad.", sep='')
-    pca = PCA(n_components=k)
-    pca.fit(X)
-    X = pca.transform(X)
+    # print(k, " features explain around 90% of the variance. From 7129 features to ", k, ", not too bad.", sep='')
+    # pca = PCA(n_components=k)
+    # pca.fit(X)
+    # X = pca.transform(X)
 
-    dct = collections.Counter(y)
-    key=dct.keys()
+    # dct = collections.Counter(y)
+    # key=dct.keys()
 
     return X, y
 
@@ -229,11 +232,11 @@ def run_sampling_technique(df_res, X, y, kf, classifier, resampler):
         f_spc.append(spc)
         f_gmn.append(gmn)
 
-    print(np.mean(f_sns, axis = 0))
-    print(np.mean(f_pre, axis = 0))
-    print(np.mean(f_f1, axis = 0))
-    print(np.mean(f_spc, axis = 0))
-    print(np.mean(f_gmn, axis = 0))
+    #print(np.mean(f_sns, axis = 0))
+    #print(np.mean(f_pre, axis = 0))
+    #print(np.mean(f_f1, axis = 0))
+    #print(np.mean(f_spc, axis = 0))
+    #print(np.mean(f_gmn, axis = 0))
     f_OQ = ['0%','10%','20%','30%','40%','50%','60%','70%','80%','90%','100%']
     ml_model = [model,model,model,model,model,model,model,model,model,model,model]
     resample_tech = [resampler,resampler,resampler,resampler,resampler,resampler,resampler,resampler,resampler,resampler,resampler]
@@ -253,10 +256,10 @@ def run_sampling_technique(df_res, X, y, kf, classifier, resampler):
     DTC_SMOTE_Res=pd.concat([ml_model_df,resample_tech_df,f_OQ_df,f_sns_df,f_sns_std_df,f_pre_df,f_pre_std_df,f_f1_df,f_f1_std_df,f_spc_df,f_spc_std_df,f_gmn_df,f_gmn_std_df],axis = 1)
     if model == 'DTC' and resampler == 'ADASYN':
         df_res = DTC_SMOTE_Res
-        print(df_res)
+        #print(df_res)
     else:
         df_res = pd.concat([df_res,DTC_SMOTE_Res],axis=0)
-        print(df_res)
+        #print(df_res)
 
     return df_res
 
@@ -266,22 +269,25 @@ def get_result(result):
 
 # %%
 if __name__ == '__main__':
-    combined, classes, class_count = import_data()
-    #plot(classes, class_count)
+    combined = import_data()
+    #plot(combined)
     X, y = encode_reduce(combined)
+
+    df = pd.DataFrame()
 
     ts = time.time()
     cnt=0
     df_res = pd.DataFrame()
 
-    kf = StratifiedKFold(n_splits=2, shuffle=True, random_state=1)
-    #model_list = ['DTC','MLP','SVM','LRC','KNN','BNB','LDA','SGDC','PAC','ETC','AdaBoost','Bagging','GradientBoosting','RandomForest','DMLP']
-    model_list = ['DTC','KNN']
+    kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
+    model_list = ['LRC','KNN','BNB','LDA','AdaBoost','RandomForest']
+    
+    #model_list = ['DTC']
 
-    #resampling_list = ['SMOTE','BorderlineSMOTE-1','BorderlineSMOTE-2','SVMSMOTE','RandomOversampler','SMOTETomek','SMOTEENN']
-    resampling_list = ['SMOTE','BorderlineSMOTE-1']
-
+    resampling_list = ['SMOTE','BorderlineSMOTE-1','BorderlineSMOTE-2','SVMSMOTE','RandomOversampler','SMOTETomek','SMOTEENN']
     ln=[]
+
+    
 
     for model in model_list:
 
@@ -318,11 +324,14 @@ if __name__ == '__main__':
         print("Model: ",model)
 
         results = []
-        pool = mp.Pool(2)
+        pool = mp.Pool(7)
         for resampler in resampling_list:
             pool.apply_async(run_sampling_technique, args=(df_res, X, y, kf, classifier, resampler) , callback=get_result)
         pool.close()
         pool.join()
 
-        print(results)
-    print('Time in serial:', time.time() - ts)
+        for result in results:
+            df = pd.concat([df, result], axis=0)
+        df.to_csv('resultsOversampling_{}.csv'.format(model))
+    df.to_csv('resultsOversampling_all.csv')
+    print('Execution Time:', time.time() - ts)
