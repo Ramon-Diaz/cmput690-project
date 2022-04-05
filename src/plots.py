@@ -12,6 +12,18 @@ PRE - Precision
 F1 
 SPC - Specificity
 GMN - Geometric Mean Score
+
+Undersampling
+RUS Random Under Sampler
+EdNN Edited Nearest Neighbours
+ReEdNN Repeated Edited Nearest Neighbours
+ConNN Condensed Nearest Neighbour
+NCR Neighbourhood Cleaning Rule
+OSS One sided Selection
+IHT InstanceHardnessThreshold
+CluCen Cluster Centroids
+TomL Tomek Links
+
 '''
 # %%
 def import_data(url):
@@ -50,9 +62,10 @@ def box_plot_by_oversampling(dfOver):
         patch.set_facecolor(color)
     for median in bp1['medians']:
         median.set(linewidth=3.0)
-    ax.set_xticklabels(df.columns.values, rotation=60)
+    ax.set_xticklabels(df.columns.values, rotation=75)
     ax.set_ylabel('F1 score')
     ax.set_xlabel('Oversampling Techniques')
+    plt.grid(axis = 'y')
     fig.tight_layout()
 
     fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_oversampling.pdf'), bbox_inches = 'tight')
@@ -72,6 +85,7 @@ def box_plot_by_oversampling_algorithm(dfOver):
     ax.set_xticklabels(df.columns.values, rotation=60)
     ax.set_ylabel('F1 score')
     ax.set_xlabel('Classifiers')
+    plt.grid(axis = 'y')
     fig.tight_layout()
 
     fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_oversampling_classifiers.pdf'), bbox_inches = 'tight')
@@ -87,7 +101,7 @@ box_plot_by_oversampling_algorithm(dfOver)
 # %%
 def box_plot_undersampling_algorithm(dfUnder):
 
-    df = pd.pivot_table(dfUnder[['Model','Resampling','F1']], values='F1',index='Resampling', columns='Model').drop('AdaBoost',axis=1)
+    df = pd.pivot_table(dfUnder[['Model','Resampling','F1']], values='F1',index='Resampling', columns='Model')
 
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
@@ -102,6 +116,7 @@ def box_plot_undersampling_algorithm(dfUnder):
     ax.set_ylabel('F1 score')
     ax.set_xlabel('Classifiers')
     fig.tight_layout()
+    plt.grid(axis = 'y')
 
     fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_undersampling_classifiers.pdf'), bbox_inches = 'tight')
 
@@ -119,8 +134,9 @@ def box_plot_undersampling_technique(dfUnder):
     ax.set_xticklabels(df.columns.values, rotation=90)
     ax.set_ylabel('F1 score')
     ax.set_xlabel('Undersampling Techniques')
-    ax.set_ylim([0.6, 1.0])
+    ax.set_ylim([0.6, 0.95])
     fig.tight_layout()
+    plt.grid(axis = 'y')
 
     fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_undersampling.pdf'), bbox_inches = 'tight')
 
