@@ -106,7 +106,7 @@ def box_plot_undersampling_algorithm(dfUnder):
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
     bp1 = ax.boxplot(df, patch_artist=True)
-    ax.set_title('F1 Score of Classifier Techniques with Oversampling')
+    ax.set_title('F1 Score of Classifier Techniques with Undersampling')
     colors = ['tab:blue', 'tab:orange', 'tab:green','tab:pink','tab:purple','tab:brown']
     for patch, color in zip(bp1['boxes'], colors):
         patch.set_facecolor(color)
