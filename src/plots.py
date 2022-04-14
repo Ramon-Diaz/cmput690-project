@@ -41,13 +41,13 @@ def line_plot(df):
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
     ax.plot(temp['F1'].unstack(level=0), label=temp['F1'].unstack(level=0).columns.values)
-    ax.set_title('F1 Score of Oversampling Techniques')
+    #ax.set_title('F1 Score of Oversampling Techniques')
     ax.legend(loc='best')
     ax.set_ylabel('F1 score')
     ax.set_xlabel('Ratio')
     fig.tight_layout()
 
-    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','line_plot_f1_oversampling.pdf'), bbox_inches = 'tight')
+    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','pca_line_plot_f1_oversampling.pdf'), bbox_inches = 'tight')
 
 
 def box_plot_by_oversampling(dfOver):
@@ -56,7 +56,7 @@ def box_plot_by_oversampling(dfOver):
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
     bp1 = ax.boxplot(df, patch_artist=True)
-    ax.set_title('F1 Score of Oversampling Techniques')
+    #ax.set_title('F1 Score of Oversampling Techniques')
     colors = ['tab:blue', 'tab:orange', 'tab:green','tab:red','tab:purple','tab:brown','tab:pink']
     for patch, color in zip(bp1['boxes'], colors):
         patch.set_facecolor(color)
@@ -68,7 +68,7 @@ def box_plot_by_oversampling(dfOver):
     plt.grid(axis = 'y')
     fig.tight_layout()
 
-    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_oversampling.pdf'), bbox_inches = 'tight')
+    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','pca_box_plot_f1_oversampling.pdf'), bbox_inches = 'tight')
 
 def box_plot_by_oversampling_algorithm(dfOver):
 
@@ -76,7 +76,7 @@ def box_plot_by_oversampling_algorithm(dfOver):
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
     bp1 = ax.boxplot(df, patch_artist=True)
-    ax.set_title('F1 Score of Classifier Techniques with Oversampling')
+    #ax.set_title('F1 Score of Classifier Techniques with Oversampling')
     colors = ['tab:blue', 'tab:orange', 'tab:green','tab:pink','tab:purple','tab:brown']
     for patch, color in zip(bp1['boxes'], colors):
         patch.set_facecolor(color)
@@ -88,13 +88,16 @@ def box_plot_by_oversampling_algorithm(dfOver):
     plt.grid(axis = 'y')
     fig.tight_layout()
 
-    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_oversampling_classifiers.pdf'), bbox_inches = 'tight')
+    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','pca_box_plot_f1_oversampling_classifiers.pdf'), bbox_inches = 'tight')
 
 
 
 # %%
-dfOver = import_data(pathlib.Path.cwd().joinpath('..','results','resultsOversampling_all.csv'))
-dfUnder = import_data(pathlib.Path.cwd().joinpath('..','results','resultsUndersampling_all.csv'))
+dfOver = import_data(pathlib.Path.cwd().joinpath('..','results','PCa_resultsOversampling.csv'))
+dfUnder = import_data(pathlib.Path.cwd().joinpath('..','results','PCA_resultsUndersampling.csv'))
+dfOver = dfOver.loc[dfOver.Model.isin(['AdaBoost','BNB','KNN','LDA','LRC','RandomForest']),:]
+dfUnder = dfUnder.loc[dfUnder.Model.isin(['AdaBoost','BNB','KNN','LDA','LRC','RandomForest']),:]
+
 line_plot(dfOver)
 box_plot_by_oversampling(dfOver)
 box_plot_by_oversampling_algorithm(dfOver)
@@ -106,7 +109,7 @@ def box_plot_undersampling_algorithm(dfUnder):
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
     bp1 = ax.boxplot(df, patch_artist=True)
-    ax.set_title('F1 Score of Classifier Techniques with Undersampling')
+    #ax.set_title('F1 Score of Classifier Techniques with Undersampling')
     colors = ['tab:blue', 'tab:orange', 'tab:green','tab:pink','tab:purple','tab:brown']
     for patch, color in zip(bp1['boxes'], colors):
         patch.set_facecolor(color)
@@ -118,14 +121,14 @@ def box_plot_undersampling_algorithm(dfUnder):
     fig.tight_layout()
     plt.grid(axis = 'y')
 
-    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_undersampling_classifiers.pdf'), bbox_inches = 'tight')
+    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','pca_box_plot_f1_undersampling_classifiers.pdf'), bbox_inches = 'tight')
 
 def box_plot_undersampling_technique(dfUnder):
     df = pd.pivot_table(dfUnder.loc[dfUnder.Model != 'AdaBoost',['Model','Resampling','F1']], values='F1',index='Model', columns='Resampling')
 
     fig, ax = plt.subplots(figsize=(fig_size_wide, fig_size_height))
     bp1 = ax.boxplot(df, patch_artist=True)
-    ax.set_title('F1 Score of Undersampling Techniques')
+    #ax.set_title('F1 Score of Undersampling Techniques')
     colors = ['tab:blue', 'tab:orange', 'tab:green','tab:red','tab:purple','tab:brown','tab:pink','tab:olive','tab:grey','tab:cyan']
     for patch, color in zip(bp1['boxes'], colors):
         patch.set_facecolor(color)
@@ -134,11 +137,11 @@ def box_plot_undersampling_technique(dfUnder):
     ax.set_xticklabels(df.columns.values, rotation=90)
     ax.set_ylabel('F1 score')
     ax.set_xlabel('Undersampling Techniques')
-    ax.set_ylim([0.6, 0.95])
+    #ax.set_ylim([0.6, 0.95])
     fig.tight_layout()
     plt.grid(axis = 'y')
 
-    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','box_plot_f1_undersampling.pdf'), bbox_inches = 'tight')
+    fig.savefig(pathlib.Path.cwd().joinpath('..','plots','pca_box_plot_f1_undersampling.pdf'), bbox_inches = 'tight')
 
 
 # %%
